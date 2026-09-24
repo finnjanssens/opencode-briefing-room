@@ -1,7 +1,7 @@
 {
   "name": "opencode-briefing-room",
   "version": "0.1.0",
-  "description": "opencode TUI sidebar panel: a pixel-art roster of running subagents",
+  "description": "opencode TUI sidebar panel: an emoji roster of running subagents",
   "type": "module",
   "author": {
     "name": "Finn Janssens",
@@ -28,7 +28,6 @@
     "solid-js": "^1.9.12"
   },
   "devDependencies": {
-    "@hackernoon/pixel-icon-library": "^1.1.0",
     "typescript": "^5"
   }
 }

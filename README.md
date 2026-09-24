@@ -2,12 +2,12 @@
 
 An opencode TUI sidebar panel that keeps a live roster of the subagents
 (`task` tool child sessions) running for the current turn. Each subagent shows
-a small pixel-art sprite for its agent type (`explore`, `scout`, `general`,
+a small emoji for its agent type (`explore`, `scout`, `general`,
 `plan`, …) instead of a text label, plus its model, token count and cost.
 
 ## What it shows
 
-- **Sprite** per agent type, colored by type (unknown agents get a `?`).
+- **Emoji** per agent type (unknown agents get a `❓`).
 - **Status** line: `running` / `retrying` / `done`, colored accordingly.
 - **Model · tokens · cost**, read from the child session's latest state.
 

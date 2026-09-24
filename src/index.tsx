@@ -1,6 +1,6 @@
 // briefing-room: an opencode TUI sidebar panel listing the subagents (task
-// tool child sessions) currently on the roster, each with a pixel-art sprite
-// for its agent type (explore, scout, general, plan, ...). A subagent joins
+// tool child sessions) currently on the roster, each with an emoji for its
+// agent type (explore, scout, general, plan, ...). A subagent joins
 // the roster when its session is created/updated and stays until a new prompt
 // is submitted to the main session -- going idle does not drop it, so the
 // panel reads as a running log of this turn's operatives. Tokens/model/cost
@@ -15,7 +15,6 @@
 import { createSignal } from "solid-js"
 import { TextAttributes } from "@opentui/core"
 import type { TuiPlugin, TuiPluginModule } from "@opencode-ai/plugin/tui"
-import { SPRITES } from "./sprites.ts"
 
 type Sub = {
   title: string
@@ -90,49 +89,15 @@ const tui: TuiPlugin = async (api) => {
     )
   }
 
-  const spriteColor = (agent?: string) => {
-    const a = agent?.toLowerCase()
-    return a === "explore"
-      ? theme.warning
-      : a === "scout"
-        ? theme.info
-        : a === "plan"
-          ? theme.success
-          : a === "general"
-            ? theme.accent
-            : theme.textMuted
+  // Emojis render in color via the terminal itself; unknown agents get a
+  // question mark.
+  const EMOJI: Record<string, string> = {
+    explore: "🔍",
+    scout: "👁️",
+    general: "🤖",
+    plan: "📋",
   }
-
-  const sprite = (agent?: string) => {
-    const rows = SPRITES[agent?.toLowerCase() ?? ""] ?? SPRITES.fallback!
-    const fg = spriteColor(agent)
-    // Rasterize 8x8 pixels to 4 lines of half-block glyphs (square pixels in
-    // a 2:1 terminal cell). Pair row 2k (top) with 2k+1 (bottom): both -> "█",
-    // top only -> "▀", bottom only -> "▄", neither -> space. Each line is one
-    // span holding the full 8-char string -- per-pixel or whitespace-only
-    // spans get trimmed/collapsed by the text layout and mangle the shape.
-    const lines: string[] = []
-    for (let i = 0; i < rows.length; i += 2) {
-      const top = rows[i] ?? ""
-      const bottom = rows[i + 1] ?? ""
-      let line = ""
-      for (let j = 0; j < top.length; j++) {
-        const t = top[j] === "#"
-        const b = bottom[j] === "#"
-        line += t && b ? "█" : t ? "▀" : b ? "▄" : " "
-      }
-      lines.push(line)
-    }
-    return (
-      <box marginRight={1}>
-        {lines.map((line) => (
-          <text>
-            <span style={{ fg }}>{line}</span>
-          </text>
-        ))}
-      </box>
-    )
-  }
+  const emoji = (agent?: string) => EMOJI[agent?.toLowerCase() ?? ""] ?? "❓"
 
   const offs = [
     api.event.on("session.updated", (evt: any) => {
@@ -217,20 +182,15 @@ const tui: TuiPlugin = async (api) => {
             ) : (
               list.map((c) => (
                 <box>
-                  <box flexDirection="row">
-                    {sprite(c.agent)}
-                    <box>
-                      <text>{c.title}</text>
-                      <text>
-                        <span style={{ fg: theme.textMuted }}>
-                          {`${c.model ?? "?"} · ${fmtTokens(c.tokens)} tok · ${fmtCost(c.cost)}`}
-                        </span>
-                        <span style={{ fg: stateColor(c.status) }}>
-                          {` · ${stateLabel(c.status)}`}
-                        </span>
-                      </text>
-                    </box>
-                  </box>
+                  <text>{`${emoji(c.agent)} ${c.title}`}</text>
+                  <text>
+                    <span style={{ fg: theme.textMuted }}>
+                      {`${c.model ?? "?"} · ${fmtTokens(c.tokens)} tok · ${fmtCost(c.cost)}`}
+                    </span>
+                    <span style={{ fg: stateColor(c.status) }}>
+                      {` · ${stateLabel(c.status)}`}
+                    </span>
+                  </text>
                 </box>
               ))
             )}
