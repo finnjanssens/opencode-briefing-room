@@ -1,0 +1,33 @@
+{
+  "name": "opencode-briefing-room",
+  "version": "0.1.0",
+  "description": "opencode TUI sidebar panel: a pixel-art roster of running subagents",
+  "type": "module",
+  "author": {
+    "name": "Finn Janssens",
+    "url": "https://github.com/finnjanssens"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/finnjanssens/opencode-briefing-room#readme",
+  "bugs": "https://github.com/finnjanssens/opencode-briefing-room/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/finnjanssens/opencode-briefing-room.git"
+  },
+  "keywords": [
+    "opencode",
+    "tui",
+    "plugin",
+    "subagents",
+    "opentui"
+  ],
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.18.21",
+    "@opentui/core": "^0.4.5",
+    "@opentui/solid": "^0.4.5",
+    "solid-js": "^1.9.12"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
