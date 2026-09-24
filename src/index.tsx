@@ -106,19 +106,20 @@ const tui: TuiPlugin = async (api) => {
   const sprite = (agent?: string) => {
     const rows = SPRITES[agent?.toLowerCase() ?? ""] ?? SPRITES.fallback!
     const fg = spriteColor(agent)
-    // Rasterize 12x12 pixels to 6 lines of half-block glyphs: each source
-    // pixel is one half of a terminal cell (square, since a cell is ~2x as
-    // tall as wide). Pair row 2k (top) with 2k+1 (bottom): both -> "█", top
-    // only -> "▀", bottom only -> "▄", neither -> space.
-    const lines: string[][] = []
+    // Rasterize 8x8 pixels to 4 lines of half-block glyphs (square pixels in
+    // a 2:1 terminal cell). Pair row 2k (top) with 2k+1 (bottom): both -> "█",
+    // top only -> "▀", bottom only -> "▄", neither -> space. Each line is one
+    // span holding the full 8-char string -- per-pixel or whitespace-only
+    // spans get trimmed/collapsed by the text layout and mangle the shape.
+    const lines: string[] = []
     for (let i = 0; i < rows.length; i += 2) {
       const top = rows[i] ?? ""
       const bottom = rows[i + 1] ?? ""
-      const line: string[] = []
+      let line = ""
       for (let j = 0; j < top.length; j++) {
         const t = top[j] === "#"
         const b = bottom[j] === "#"
-        line.push(t && b ? "█" : t ? "▀" : b ? "▄" : " ")
+        line += t && b ? "█" : t ? "▀" : b ? "▄" : " "
       }
       lines.push(line)
     }
@@ -126,13 +127,7 @@ const tui: TuiPlugin = async (api) => {
       <box marginRight={1}>
         {lines.map((line) => (
           <text>
-            {line.map((ch) =>
-              ch === " " ? (
-                <span> </span>
-              ) : (
-                <span style={{ fg, bg: theme.background }}>{ch}</span>
-              ),
-            )}
+            <span style={{ fg }}>{line}</span>
           </text>
         ))}
       </box>

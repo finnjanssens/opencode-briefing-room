@@ -1,6 +1,6 @@
 // Regenerates src/sprites.ts from the Pixel Icon Library (HackerNoon) SVG
 // source. opentui has no image renderer, so we rasterize the 24x24 icons to a
-// pixel grid, downscale to 12x12, and emit "#"/"." rows the plugin renders
+// pixel grid, downscale to 8x8, and emit "#"/"." rows the plugin renders
 // with half-block characters (square pixels in a 2:1 terminal cell).
 //
 // Run with: node scripts/build-sprites.mjs
@@ -24,7 +24,7 @@ const ICONS = {
 }
 
 const SIZE = 24
-const TARGET = 12
+const TARGET = 8
 
 // --- shape extraction -----------------------------------------------------
 
@@ -120,12 +120,14 @@ function rasterize(svg) {
 }
 
 function downscale(grid) {
+  const step = SIZE / TARGET
   const out = []
   for (let y = 0; y < TARGET; y++) {
     let row = ""
     for (let x = 0; x < TARGET; x++) {
       let on = false
-      for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++) on ||= grid[y * 2 + dy][x * 2 + dx]
+      for (let dy = 0; dy < step; dy++)
+        for (let dx = 0; dx < step; dx++) on ||= grid[y * step + dy][x * step + dx]
       row += on ? "#" : "."
     }
     out.push(row)
