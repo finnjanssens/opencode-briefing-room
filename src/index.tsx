@@ -15,6 +15,7 @@
 import { createSignal } from "solid-js"
 import { TextAttributes } from "@opentui/core"
 import type { TuiPlugin, TuiPluginModule } from "@opencode-ai/plugin/tui"
+import { SPRITES } from "./sprites.ts"
 
 type Sub = {
   title: string
@@ -23,15 +24,6 @@ type Sub = {
   model?: string
   tokens?: number
   cost?: number
-}
-
-// 4x4 pixel sprites: "#" is a filled block, "." is transparent.
-const FALLBACK = ["####", "...#", ".##.", "..#."]
-const SHAPES: Record<string, string[]> = {
-  explore: [".##.", "#..#", ".##.", "#..."],
-  scout: ["####", "#..#", "#..#", "####"],
-  general: [".##.", "####", "####", "#..#"],
-  plan: ["####", "#..#", "#..#", ".##."],
 }
 
 const tui: TuiPlugin = async (api) => {
@@ -112,14 +104,34 @@ const tui: TuiPlugin = async (api) => {
   }
 
   const sprite = (agent?: string) => {
-    const rows = SHAPES[agent?.toLowerCase() ?? ""] ?? FALLBACK
+    const rows = SPRITES[agent?.toLowerCase() ?? ""] ?? SPRITES.fallback!
     const fg = spriteColor(agent)
+    // Rasterize 12x12 pixels to 6 lines of half-block glyphs: each source
+    // pixel is one half of a terminal cell (square, since a cell is ~2x as
+    // tall as wide). Pair row 2k (top) with 2k+1 (bottom): both -> "█", top
+    // only -> "▀", bottom only -> "▄", neither -> space.
+    const lines: string[][] = []
+    for (let i = 0; i < rows.length; i += 2) {
+      const top = rows[i] ?? ""
+      const bottom = rows[i + 1] ?? ""
+      const line: string[] = []
+      for (let j = 0; j < top.length; j++) {
+        const t = top[j] === "#"
+        const b = bottom[j] === "#"
+        line.push(t && b ? "█" : t ? "▀" : b ? "▄" : " ")
+      }
+      lines.push(line)
+    }
     return (
       <box marginRight={1}>
-        {rows.map((row) => (
+        {lines.map((line) => (
           <text>
-            {[...row].map((ch) =>
-              ch === "#" ? <span style={{ fg }}>█</span> : <span> </span>,
+            {line.map((ch) =>
+              ch === " " ? (
+                <span> </span>
+              ) : (
+                <span style={{ fg, bg: theme.background }}>{ch}</span>
+              ),
             )}
           </text>
         ))}

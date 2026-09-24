@@ -10,6 +10,7 @@
     "jsx": "preserve",
     "jsxImportSource": "@opentui/solid",
     "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force"
   },

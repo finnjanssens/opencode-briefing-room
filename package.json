@@ -28,6 +28,7 @@
     "solid-js": "^1.9.12"
   },
   "devDependencies": {
+    "@hackernoon/pixel-icon-library": "^1.1.0",
     "typescript": "^5"
   }
 }
